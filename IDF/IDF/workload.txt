@@ -1,5 +1,3 @@
-3557 queries (133 unique) parsed in 15.99882 seconds
-133 most frequent queries
 124 times: SELECT * FROM autompg WHERE model_year = '82' AND type = 'sedan'
 120 times: SELECT * FROM autompg WHERE model_year = '81'
 100 times: SELECT * FROM autompg WHERE mpg = '28' AND cylinders = '4' AND horsepower = '110' AND acceleration = '13.50' AND brand = 'volkswagen'
@@ -133,4 +131,3 @@
 1 times: SELECT displacement FROM autompg WHERE mpg = '8' AND cylinders = '7' AND horsepower = '250'
 1 times: SELECT * FROM autompg WHERE displacement = '385'
 1 times: SELECT horsepower, acceleration FROM autompg WHERE brand = 'mercury'
-
