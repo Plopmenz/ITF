@@ -10,8 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="hello.db">
+    <None Update="autompg.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="hello.db">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
