@@ -51,31 +51,46 @@ namespace IDF
                     string[] split = line.Split(" times: ");
                     int count = int.Parse(split[0]);
 
-                    var rqfCommand = connection.CreateCommand();
-                    rqfCommand.CommandText = split[1];
-                    using (var reader = rqfCommand.ExecuteReader())
+                    string filter = split[1].Split(" WHERE ")[1];
+                    string[] attributeValues = filter.Split(" AND ");
+                    foreach (string attributeValue in attributeValues)
                     {
-                        while (reader.Read())
+                        string name;
+                        string[] values;
+                        if (attributeValue.Contains(" = "))
                         {
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                string attributeName = reader.GetName(i);
-                                if (attributeName == "id")
-                                    continue;
+                            string[] eqSplit = attributeValue.Split(" = ");
 
-                                string attributeValue = reader.GetString(i);
-                                if (rqf.ContainsKey(attributeName))
-                                {
-                                    if (rqf[attributeName].ContainsKey(attributeValue))
-                                        rqf[attributeName][attributeValue] += count;
-                                    else
-                                        rqf[attributeName].Add(attributeValue, count);
-                                }
+                            name = eqSplit[0];
+                            values = new string[] { eqSplit[1] }; //remove ''
+                        }
+                        else if (attributeValue.Contains(" IN "))
+                        {
+                            string[] inSplit = attributeValue.Split(" IN ");
+
+                            name = inSplit[0];
+                            values = inSplit[1].Substring(1, inSplit[1].Length - 2).Split(','); //remove ()
+                        }
+                        else throw new NotImplementedException();
+
+                        foreach (string value in values)
+                        {
+                            string v = value.Substring(1, value.Length - 2);
+                            if (name == "id")
+                                continue;
+
+                            Console.WriteLine($"{name}: {v}");
+                            if (rqf.ContainsKey(name))
+                            {
+                                if (rqf[name].ContainsKey(v))
+                                    rqf[name][v] += count;
                                 else
-                                {
-                                    rqf.Add(attributeName, new Dictionary<string, int>());
-                                    rqf[attributeName].Add(attributeValue, count);
-                                }
+                                    rqf[name].Add(v, count);
+                            }
+                            else
+                            {
+                                rqf.Add(name, new Dictionary<string, int>());
+                                rqf[name].Add(v, count);
                             }
                         }
                     }
@@ -96,19 +111,26 @@ namespace IDF
                     rqfmax.Add(bigPair.Key, highestCount);
                 }
 
-                //qf catogorical
-                Dictionary<string, float> originQF = GetQF(rqf["origin"], rqfmax["origin"]);
-                Dictionary<string, float> brandQF = GetQF(rqf["brand"], rqfmax["brand"]);
-                Dictionary<string, float> modelQF = GetQF(rqf["model"], rqfmax["model"]);
-                Dictionary<string, float> typeQF = GetQF(rqf["type"], rqfmax["type"]);
+                //qf both
+                Dictionary<string, float> mpgQF = GetQF(rqf["mpg"], rqfmax["mpg"], 1);
+                Dictionary<string, float> cylindersQF = GetQF(rqf["cylinders"], rqfmax["cylinders"], 1);
+                Dictionary<string, float> displacementQF = GetQF(rqf["displacement"], rqfmax["displacement"], 1);
+                Dictionary<string, float> horsepowerQF = GetQF(rqf["horsepower"], rqfmax["horsepower"], 1);
+                //Dictionary<string, float> weightQF = GetQF(rqf["weight"], rqfmax["weight"], 1);
+                Dictionary<string, float> accelerationQF = GetQF(rqf["acceleration"], rqfmax["acceleration"], 1);
+                Dictionary<string, float> modelyearQF = GetQF(rqf["model_year"], rqfmax["model_year"], 1);
+                //Dictionary<string, float> originQF = GetQF(rqf["origin"], rqfmax["origin"]);
+                Dictionary<string, float> brandQF = GetQF(rqf["brand"], rqfmax["brand"], 0);
+                //Dictionary<string, float> modelQF = GetQF(rqf["model"], rqfmax["model"]);
+                Dictionary<string, float> typeQF = GetQF(rqf["type"], rqfmax["type"], 0);
             }
         }
 
-        static Dictionary<T, float> GetQF<T>(Dictionary<T, int> rqf, int max)
+        static Dictionary<T, float> GetQF<T>(Dictionary<T, int> rqf, int max, int add)
         {
             Dictionary<T, float> result = new Dictionary<T, float>();
             foreach (KeyValuePair<T, int> pair in rqf)
-                result.Add(pair.Key, pair.Value / max);
+                result.Add(pair.Key, (pair.Value + add) / (max + add));
             return result;
         }
 
