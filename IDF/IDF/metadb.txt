@@ -1,0 +1,3 @@
+CREATE TABLE H_Value(attribute TEXT, h INT);
+CREATE TABLE IDF(attribute TEXT, value TEXT, idf INT, PRIMARY KEY (attribute, value));
+CREATE TABLE QF(attribute TEXT, value TEXT, qf INT, PRIMARY KEY (attribute, value));

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace IDF
 {
@@ -25,19 +26,21 @@ namespace IDF
                 }
 
                 //h values numerical
-                float mpgH = CalcH(StandardDeviation(databaseInfo.Select(auto => auto.mpg)), databaseInfo.Count);
-                float cylindersH = CalcH(StandardDeviationF(databaseInfo.Select(auto => auto.cylinders)), databaseInfo.Count);
-                float displacementH = CalcH(StandardDeviation(databaseInfo.Select(auto => auto.displacement)), databaseInfo.Count);
-                float horsepowerH = CalcH(StandardDeviation(databaseInfo.Select(auto => auto.horsepower)), databaseInfo.Count);
-                float weightH = CalcH(StandardDeviation(databaseInfo.Select(auto => auto.weight)), databaseInfo.Count);
-                float accelerationH = CalcH(StandardDeviationF(databaseInfo.Select(auto => auto.acceleration)), databaseInfo.Count);
-                float modelyearH = CalcH(StandardDeviation(databaseInfo.Select(auto => auto.modelyear)), databaseInfo.Count);
+                Dictionary<string, float> H = new Dictionary<string, float>();
+                H.Add("mph", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.mpg)), databaseInfo.Count));
+                H.Add("cylinders", CalcH(StandardDeviationF(databaseInfo.Select(auto => auto.cylinders)), databaseInfo.Count));
+                H.Add("displacement", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.displacement)), databaseInfo.Count));
+                H.Add("horsepower", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.horsepower)), databaseInfo.Count));
+                H.Add("weight", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.weight)), databaseInfo.Count));
+                H.Add("acceleration", CalcH(StandardDeviationF(databaseInfo.Select(auto => auto.acceleration)), databaseInfo.Count));
+                H.Add("model_year", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.modelyear)), databaseInfo.Count));
 
                 //idf categorical
-                Dictionary<int, float> originIDF = GetIDF(databaseInfo.Select(auto => auto.origin));
-                Dictionary<string, float> brandIDF = GetIDF(databaseInfo.Select(auto => auto.brand));
-                Dictionary<string, float> modelIDF = GetIDF(databaseInfo.Select(auto => auto.model));
-                Dictionary<string, float> typeIDF = GetIDF(databaseInfo.Select(auto => auto.type));
+                Dictionary<string, Dictionary<string, float>> IDF = new Dictionary<string, Dictionary<string, float>>();
+                IDF.Add("origin", GetIDF(databaseInfo.Select(auto => auto.origin)));
+                IDF.Add("brand", GetIDF(databaseInfo.Select(auto => auto.brand)));
+                IDF.Add("model", GetIDF(databaseInfo.Select(auto => auto.model)));
+                IDF.Add("type", GetIDF(databaseInfo.Select(auto => auto.type)));
 
                 //rfq both
                 Dictionary<string, Dictionary<string, int>> rqf = new Dictionary<string, Dictionary<string, int>>();
@@ -112,17 +115,35 @@ namespace IDF
                 }
 
                 //qf both
-                Dictionary<string, float> mpgQF = GetQF(rqf["mpg"], rqfmax["mpg"], 1);
-                Dictionary<string, float> cylindersQF = GetQF(rqf["cylinders"], rqfmax["cylinders"], 1);
-                Dictionary<string, float> displacementQF = GetQF(rqf["displacement"], rqfmax["displacement"], 1);
-                Dictionary<string, float> horsepowerQF = GetQF(rqf["horsepower"], rqfmax["horsepower"], 1);
-                //Dictionary<string, float> weightQF = GetQF(rqf["weight"], rqfmax["weight"], 1);
-                Dictionary<string, float> accelerationQF = GetQF(rqf["acceleration"], rqfmax["acceleration"], 1);
-                Dictionary<string, float> modelyearQF = GetQF(rqf["model_year"], rqfmax["model_year"], 1);
-                //Dictionary<string, float> originQF = GetQF(rqf["origin"], rqfmax["origin"]);
-                Dictionary<string, float> brandQF = GetQF(rqf["brand"], rqfmax["brand"], 0);
-                //Dictionary<string, float> modelQF = GetQF(rqf["model"], rqfmax["model"]);
-                Dictionary<string, float> typeQF = GetQF(rqf["type"], rqfmax["type"], 0);
+                Dictionary<string, Dictionary<string, float>> QF = new Dictionary<string, Dictionary<string, float>>();
+                QF.Add("mpg", GetQF(rqf["mpg"], rqfmax["mpg"], 1));
+                QF.Add("cylinders", GetQF(rqf["cylinders"], rqfmax["cylinders"], 1));
+                QF.Add("displacement", GetQF(rqf["displacement"], rqfmax["displacement"], 1));
+                QF.Add("horsepower", GetQF(rqf["horsepower"], rqfmax["horsepower"], 1));
+                //weight is not queried
+                QF.Add("acceleration", GetQF(rqf["acceleration"], rqfmax["acceleration"], 1));
+                QF.Add("model_year", GetQF(rqf["model_year"], rqfmax["model_year"], 1));
+                //origin is not queried
+                QF.Add("brand", GetQF(rqf["brand"], rqfmax["brand"], 0));
+                //model is not queried
+                QF.Add("type", GetQF(rqf["type"], rqfmax["type"], 0));
+
+                var insertCommand = connection.CreateCommand();
+                StringBuilder commandBuilder = new StringBuilder(); 
+                foreach (KeyValuePair<string, float> hPair in H)
+                    commandBuilder.AppendLine($"INSERT INTO H_Value (attribute, h) VALUES ('{hPair.Key}', '{hPair.Value}');");
+
+                foreach (KeyValuePair<string, Dictionary<string, float>> idfPair in IDF)
+                    foreach (KeyValuePair<string, float> idfAttributePair in idfPair.Value)
+                        commandBuilder.AppendLine($"INSERT INTO IDF (attribute, value, idf) VALUES ('{idfPair.Key}', '{idfAttributePair.Key}', '{idfAttributePair.Value}');");
+
+                foreach (KeyValuePair<string, Dictionary<string, float>> qfPair in QF)
+                    foreach (KeyValuePair<string, float> qfAttributePair in qfPair.Value)
+                        commandBuilder.AppendLine($"INSERT INTO QF (attribute, value, qf) VALUES ('{qfPair.Key}', '{qfAttributePair.Key}', '{qfAttributePair.Value}');");
+
+                insertCommand.CommandText = commandBuilder.ToString();
+                int code = insertCommand.ExecuteNonQuery();
+                Console.WriteLine(code);
             }
         }
 
@@ -130,7 +151,7 @@ namespace IDF
         {
             Dictionary<T, float> result = new Dictionary<T, float>();
             foreach (KeyValuePair<T, int> pair in rqf)
-                result.Add(pair.Key, (pair.Value + add) / (max + add));
+                result.Add(pair.Key, (pair.Value + add) / (float)(max + add));
             return result;
         }
 
@@ -147,7 +168,7 @@ namespace IDF
 
             Dictionary<T, float> result = new Dictionary<T, float>();
             foreach(KeyValuePair<T, int> pair in counter)
-                result.Add(pair.Key, (float)Math.Log(collection.Count() / pair.Value));
+                result.Add(pair.Key, (float)Math.Log(collection.Count() / (float)pair.Value));
 
             return result;
         }
@@ -198,7 +219,7 @@ namespace IDF
         public int modelyear;
 
         //categoricals
-        public int origin;
+        public string origin;
         public string brand;
         public string model;
         public string type;
@@ -212,7 +233,7 @@ namespace IDF
             weight = reader.GetInt32(5);
             acceleration = reader.GetFloat(6);
             modelyear = reader.GetInt32(7);
-            origin = reader.GetInt32(8);
+            origin = reader.GetInt32(8).ToString(); //origin acts more as a string
             brand = reader.GetString(9);
             model = reader.GetString(10);
             type = reader.GetString(11);
