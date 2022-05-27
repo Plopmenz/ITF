@@ -27,7 +27,7 @@ namespace IDF
 
                 //h values numerical
                 Dictionary<string, float> H = new Dictionary<string, float>();
-                H.Add("mph", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.mpg)), databaseInfo.Count));
+                H.Add("mpg", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.mpg)), databaseInfo.Count));
                 H.Add("cylinders", CalcH(StandardDeviationF(databaseInfo.Select(auto => auto.cylinders)), databaseInfo.Count));
                 H.Add("displacement", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.displacement)), databaseInfo.Count));
                 H.Add("horsepower", CalcH(StandardDeviation(databaseInfo.Select(auto => auto.horsepower)), databaseInfo.Count));
@@ -44,6 +44,7 @@ namespace IDF
 
                 //rfq both
                 Dictionary<string, Dictionary<string, int>> rqf = new Dictionary<string, Dictionary<string, int>>();
+                Dictionary<string, Dictionary<(string, string), int>> jacr = new Dictionary<string, Dictionary<(string, string), int>>();
                 StreamReader sReader = new StreamReader("workload.txt");
                 string line;
                 while ((line = sReader.ReadLine()) != null)
@@ -73,6 +74,24 @@ namespace IDF
 
                             name = inSplit[0];
                             values = inSplit[1].Substring(1, inSplit[1].Length - 2).Split(','); //remove ()
+                            foreach (string value1 in values)
+                            {
+                                string v1 = value1.Substring(1, value1.Length - 2);
+                                foreach (string value2 in values)
+                                {
+                                    string v2 = value2.Substring(1, value2.Length - 2);
+                                    if (v1.CompareTo(v2) != -1)
+                                        continue;
+
+                                    if (!jacr.ContainsKey(name))
+                                        jacr.Add(name, new Dictionary<(string, string), int>());
+
+                                    if (!jacr[name].ContainsKey((v1, v2)))
+                                        jacr[name].Add((v1, v2), 0);
+
+                                    jacr[name][(v1, v2)] += count;
+                                }
+                            }
                         }
                         else throw new NotImplementedException();
 
@@ -82,7 +101,6 @@ namespace IDF
                             if (name == "id")
                                 continue;
 
-                            Console.WriteLine($"{name}: {v}");
                             if (rqf.ContainsKey(name))
                             {
                                 if (rqf[name].ContainsKey(v))
@@ -98,6 +116,21 @@ namespace IDF
                         }
                     }
                 }
+
+                //jac
+                Dictionary<string, Dictionary<(string, string), float>> jac = new Dictionary<string, Dictionary<(string, string), float>>();
+                foreach (KeyValuePair<string, Dictionary<(string, string), int>> jacrPair in jacr)
+                {
+                    jac.Add(jacrPair.Key, new Dictionary<(string, string), float>());
+                    foreach (KeyValuePair<(string, string), int> jacrAttributePair in jacrPair.Value)
+                    {
+                        int val1 = rqf[jacrPair.Key][jacrAttributePair.Key.Item1];
+                        int val2 = rqf[jacrPair.Key][jacrAttributePair.Key.Item2];
+                        jac[jacrPair.Key].Add(jacrAttributePair.Key, jacrAttributePair.Value /
+                            (float)(val1 + val2 - jacrAttributePair.Value));
+                    }
+                }
+
 
                 //rqfmax both
                 Dictionary<string, int> rqfmax = new Dictionary<string, int>();
@@ -140,6 +173,10 @@ namespace IDF
                 foreach (KeyValuePair<string, Dictionary<string, float>> qfPair in QF)
                     foreach (KeyValuePair<string, float> qfAttributePair in qfPair.Value)
                         commandBuilder.AppendLine($"INSERT INTO QF (attribute, value, qf) VALUES ('{qfPair.Key}', '{qfAttributePair.Key}', '{qfAttributePair.Value}');");
+
+                foreach (KeyValuePair<string, Dictionary<(string, string), float>> jacPair in jac)
+                    foreach (KeyValuePair<(string, string), float> jacAttributePair in jacPair.Value)
+                        commandBuilder.AppendLine($"INSERT INTO Jac (attribute, value1, value2, jac) VALUES ('{jacPair.Key}', '{jacAttributePair.Key.Item1}', '{jacAttributePair.Key.Item2}', '{jacAttributePair.Value}');");
 
                 insertCommand.CommandText = commandBuilder.ToString();
                 int code = insertCommand.ExecuteNonQuery();
