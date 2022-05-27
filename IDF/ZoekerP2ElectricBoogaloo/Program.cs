@@ -17,7 +17,10 @@ namespace ZoekerP2ElectricBoogaloo
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Form1 GUI = new Form1();
+            QueryProcessor processor = new QueryProcessor();
+            GUI.confirmButton.Click += (object sender, EventArgs e) => GUI.output.Text = processor.Process(GUI.input.Text);
+            Application.Run(GUI);
         }
     }
 }

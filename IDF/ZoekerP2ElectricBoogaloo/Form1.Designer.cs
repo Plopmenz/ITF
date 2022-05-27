@@ -29,13 +29,70 @@ namespace ZoekerP2ElectricBoogaloo
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.output = new System.Windows.Forms.Label();
+            this.input = new System.Windows.Forms.TextBox();
+            this.confirmButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.SuspendLayout();
+            // 
+            // output
+            // 
+            this.output.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.output.Location = new System.Drawing.Point(105, 91);
+            this.output.Margin = new System.Windows.Forms.Padding(0);
+            this.output.Name = "output";
+            this.output.Size = new System.Drawing.Size(600, 350);
+            this.output.TabIndex = 0;
+            this.output.Text = "Result";
+            this.output.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // input
+            // 
+            this.input.Location = new System.Drawing.Point(316, 39);
+            this.input.Name = "input";
+            this.input.Size = new System.Drawing.Size(128, 23);
+            this.input.TabIndex = 1;
+            // 
+            // confirmButton
+            // 
+            this.confirmButton.Location = new System.Drawing.Point(527, 32);
+            this.confirmButton.Name = "confirmButton";
+            this.confirmButton.Size = new System.Drawing.Size(119, 34);
+            this.confirmButton.TabIndex = 2;
+            this.confirmButton.Text = "Sumbit";
+            this.confirmButton.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(197, 42);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(40, 15);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "query:";
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.confirmButton);
+            this.Controls.Add(this.input);
+            this.Controls.Add(this.output);
+            this.Name = "Form1";
             this.Text = "Form1";
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
+
+        public System.Windows.Forms.Label output;
+        public System.Windows.Forms.TextBox input;
+        public System.Windows.Forms.Button confirmButton;
+        private System.Windows.Forms.Label label1;
     }
 }
 
