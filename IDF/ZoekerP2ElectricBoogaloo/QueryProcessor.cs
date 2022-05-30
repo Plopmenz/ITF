@@ -108,7 +108,8 @@ namespace ZoekerP2ElectricBoogaloo
                 string attributeValue = eqSplit[1];
                 if (attributeName == "k")
                 {
-                    k = int.Parse(attributeValue);
+                    string newVal = attributeValue.Remove(attributeValue.Length - 1);
+                    k = int.Parse(newVal);
                     continue;
                 }
 

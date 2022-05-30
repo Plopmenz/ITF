@@ -18,8 +18,6 @@ namespace ZoekerP2ElectricBoogaloo
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Form1 GUI = new Form1();
-            QueryProcessor processor = new QueryProcessor();
-            GUI.confirmButton.Click += (object sender, EventArgs e) => GUI.output.Text = processor.Process(GUI.input.Text);
             Application.Run(GUI);
         }
     }
