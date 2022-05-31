@@ -13,6 +13,7 @@ namespace ZoekerP2ElectricBoogaloo
     public partial class Form1 : Form
     {
         QueryProcessor processor = new QueryProcessor();
+        
         public Form1()
         {
             InitializeComponent();
@@ -73,11 +74,12 @@ namespace ZoekerP2ElectricBoogaloo
                     outp += ", type = '" + typeBox.Text + "'";
                 }
                 outp += ";";
-                output.Text = processor.Process(outp);
+                textBox1.Text = processor.Process(outp);
+              
             }
             else
             {
-                output.Text = processor.Process(input.Text);
+                textBox1.Text = processor.Process(input.Text);
             }
         }
     }

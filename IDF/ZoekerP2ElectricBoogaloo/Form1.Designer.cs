@@ -29,11 +29,9 @@ namespace ZoekerP2ElectricBoogaloo
         /// </summary>
         private void InitializeComponent()
         {
-            this.output = new System.Windows.Forms.Label();
             this.input = new System.Windows.Forms.TextBox();
             this.confirmButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
             this.accelLabel = new System.Windows.Forms.Label();
             this.accelBox = new System.Windows.Forms.TextBox();
             this.cylinderLabel = new System.Windows.Forms.Label();
@@ -58,19 +56,10 @@ namespace ZoekerP2ElectricBoogaloo
             this.originBox = new System.Windows.Forms.TextBox();
             this.topKBox = new System.Windows.Forms.NumericUpDown();
             this.topKLabel = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.output = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.topKBox)).BeginInit();
             this.SuspendLayout();
-            // 
-            // output
-            // 
-            this.output.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.output.Location = new System.Drawing.Point(75, 325);
-            this.output.Margin = new System.Windows.Forms.Padding(0);
-            this.output.Name = "output";
-            this.output.Size = new System.Drawing.Size(700, 350);
-            this.output.TabIndex = 0;
-            this.output.Text = "Result";
-            this.output.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // input
             // 
@@ -97,13 +86,6 @@ namespace ZoekerP2ElectricBoogaloo
             this.label1.Size = new System.Drawing.Size(85, 15);
             this.label1.TabIndex = 3;
             this.label1.Text = "Manual Query:";
-            // 
-            // vScrollBar1
-            // 
-            this.vScrollBar1.Location = new System.Drawing.Point(808, 325);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(17, 350);
-            this.vScrollBar1.TabIndex = 4;
             // 
             // accelLabel
             // 
@@ -307,11 +289,32 @@ namespace ZoekerP2ElectricBoogaloo
             this.topKLabel.TabIndex = 29;
             this.topKLabel.Text = "Top-K";
             // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(12, 331);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox1.Size = new System.Drawing.Size(810, 368);
+            this.textBox1.TabIndex = 30;
+            // 
+            // output
+            // 
+            this.output.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.output.Location = new System.Drawing.Point(9, 323);
+            this.output.Margin = new System.Windows.Forms.Padding(0);
+            this.output.Name = "output";
+            this.output.Size = new System.Drawing.Size(800, 350);
+            this.output.TabIndex = 0;
+            this.output.Text = "Result";
+            this.output.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(834, 711);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.topKLabel);
             this.Controls.Add(this.topKBox);
             this.Controls.Add(this.originBox);
@@ -336,7 +339,6 @@ namespace ZoekerP2ElectricBoogaloo
             this.Controls.Add(this.cylinderLabel);
             this.Controls.Add(this.accelBox);
             this.Controls.Add(this.accelLabel);
-            this.Controls.Add(this.vScrollBar1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.confirmButton);
             this.Controls.Add(this.input);
@@ -350,12 +352,9 @@ namespace ZoekerP2ElectricBoogaloo
         }
 
         #endregion
-
-        public System.Windows.Forms.Label output;
         public System.Windows.Forms.TextBox input;
         public System.Windows.Forms.Button confirmButton;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.VScrollBar vScrollBar1;
         private System.Windows.Forms.Label accelLabel;
         private System.Windows.Forms.TextBox accelBox;
         private System.Windows.Forms.Label cylinderLabel;
@@ -380,6 +379,8 @@ namespace ZoekerP2ElectricBoogaloo
         private System.Windows.Forms.TextBox originBox;
         private System.Windows.Forms.NumericUpDown topKBox;
         private System.Windows.Forms.Label topKLabel;
+        private System.Windows.Forms.TextBox textBox1;
+        public System.Windows.Forms.Label output;
     }
 }
 
